@@ -1,0 +1,71 @@
+# 2022-01-05T16:58:24+08:00
+ai: |
+  filters:
+  - kind: Proxy
+    mainPool:
+      loadBalance:
+        policy: roundRobin
+      servers:
+      - url: https://ai.ai-team.smoketest.cn
+    name: proxy
+  flow:
+  - filter: proxy
+    jumpIf: {}
+  kind: HTTPPipeline
+  name: ai
+apigateway: |
+  autoCert: false
+  caCertBase64: ""
+  cacheSize: 0
+  certBase64: ""
+  certs: {}
+  http3: false
+  https: false
+  keepAlive: true
+  keepAliveTimeout: 75s
+  keyBase64: ""
+  keys: {}
+  kind: HTTPServer
+  maxConnections: 10240
+  name: apigateway
+  port: 8080
+  rules:
+  - host: ""
+    hostRegexp: ""
+    paths:
+    - backend: hello
+      headers: []
+      pathPrefix: /hello
+      rewriteTarget: ""
+    - backend: ai
+      headers: []
+      pathPrefix: /ai
+      rewriteTarget: ""
+    - backend: baidu
+      headers: []
+      pathPrefix: /
+      rewriteTarget: ""
+  tracing:
+    serviceName: baichuan
+    tags: {}
+    zipkin:
+      hostport: 0.0.0.0:8080
+      id128Bit: false
+      sameSpan: true
+      sampleRate: 1
+      serverURL: http://192.168.10.90:30034/api/v2/spans
+  xForwardedFor: false
+hello: |
+  filters:
+  - kind: Proxy
+    mainPool:
+      loadBalance:
+        policy: roundRobin
+      servers:
+      - url: http://192.168.24.212:8000
+    name: proxy
+  flow:
+  - filter: proxy
+    jumpIf: {}
+  kind: HTTPPipeline
+  name: hello
